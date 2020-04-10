@@ -1,10 +1,15 @@
 /* Navbar colours */ 
 .navbar-custom { 
-    background-color: #126D71; 
+  background-color: #303030;
 } 
 
-/* Modify brand and text color */ 
+/* Modify brand and text colours */
 .navbar-custom .navbar-brand, 
 .navbar-custom .navbar-text { 
-    color: #ECEDF2; 
+  color: #F97070;
 } 
+
+/* Link colours */
+a:hover {
+  color: deeppink;
+}
