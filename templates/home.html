@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% for name, documents in projects.items() %}
+      <div class="container rounded" style="border:1px solid #cecece;">
+      <div><h2> {{ name }} </h2>
+      {% for docname, docloc in documents.items() %}
+        {% set encoded_fname = docloc.encode() | b64encode %}
+        <li> {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a></li>
+      {% endfor %}
+      </div> <!-- name -->
+     </div> <!-- container -->
+    {% else %}
+      <h1> No project available </h1>
+    {% endfor %}
+  
+  {% for _ in range(1024) %}
+    <br/>
+  {% endfor %}
+
+{% endblock %}
