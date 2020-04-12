@@ -3,13 +3,67 @@
   background-color: #303030;
 } 
 
+body {
+  background-color: #444444;
+  color: #FFFFE6;
+}
+
+::selection {
+  background-color: #8EBF42;
+}
+
+.card {
+  border-color: deeppink;
+}
+
+.card-header {
+  background-color: #303030;
+}
+
+.card-body {
+  background-color: #444444;
+}
+
 /* Modify brand and text colours */
 .navbar-custom .navbar-brand, 
 .navbar-custom .navbar-text { 
-  color: #F97070;
+  color: deeppink;
 } 
 
+.btn.btn-outline-warning {
+  color: deeppink;
+  border-color: deeppink;
+}
+
+.btn.btn-outline-warning:hover,
+.btn.btn-outline-warning:focus,
+.btn.btn-outline-warning:active,
+.btn.btn-outline-warning.active {
+  color: #ffffff;
+  background-color: deeppink;
+  border-color: deeppink;
+}
+
 /* Link colours */
+a {
+  color: #FFCCCC;
+}
 a:hover {
   color: deeppink;
+  text-decoration: none;
+}
+
+.btn-link,
+.btn-link:hover {
+  color: #8EBF42;
+  text-decoration: none;
+}
+
+/* Used when rendering sources */
+pre {
+  color: deeppink;
+}
+
+.deeppink::selection {
+  background-color: #444444;
 }
