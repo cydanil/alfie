@@ -15,7 +15,8 @@ app.add_template_filter(base64.b64encode, 'b64encode')
 projects = {'icepap-ipassign':
             {'README.md': '/home/cydanil/icepap-ipassign/README.md',
              'GUI README': '/home/cydanil/icepap-ipassign/ipa_gui/gui.md'},
-            'alfie': {},
+            'alfie':
+            {'Github': 'https://github.com/cydanil/alfie'},
             'rookie': {},
             'rook': {},
             'seagull': {},
@@ -46,17 +47,35 @@ async def retrieve(filename: bytes) -> str:
 
 @app.route('/download/<project_name>')
 async def download(project_name: str):
+    """Create a zip archive of a project.
+
+    Zip the files from the storage path.
+    External resources (ie. link) are compiled into a external_resources.txt
+    file.
+    """
     documents = projects[project_name]
 
     file_ = io.BytesIO()
+    externals = []
     with zipfile.ZipFile(file_, 'w') as zf:
         for filename, location in documents.items():
+            if location.startswith('http'):
+                externals.append((filename, location))
+                continue
+            # Sanitize the file name
             fname = filename.replace(' ', '_')
             fname_ext = fname.split('.')[-1]
             loc_ext = location.split('.')[-1]
             if fname_ext != loc_ext:
                 fname = f'{fname}.{loc_ext}'
+            # Write the file
             zf.write(location, fname)
+
+        # Handle external resources
+        if externals:
+            content = '\n'.join(f'{name}: {uri}' for name, uri in externals)
+            zf.writestr('external_resources.txt', content)
+
     file_.seek(0)
     ret = await send_file(file_,
                           attachment_filename=f'{project_name}.zip',

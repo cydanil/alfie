@@ -23,8 +23,12 @@
                     <div id="{{ div_id }}" class="collapse" aria-labelledby={{ heading_id }}" data-parent="#accordion">
                         <div class="card-body">
                             {% for docname, docloc in documents.items() %}
-                                {% set encoded_fname = docloc.encode() | b64encode %}
-                                {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
+                                {% if docloc.startswith('http') %}
+                                  {{ docname }} : <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
+                                {% else %}
+                                    {% set encoded_fname = docloc.encode() | b64encode %}
+                                    {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
+                                {% endif %}
                                 <br/>
                             {% endfor %}
                         </div> <!-- card-body -->
