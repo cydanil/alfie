@@ -1,18 +1,27 @@
+import quart.flask_patch  # noqa
 import base64
 import io
 import zipfile
 
+from flaskext.markdown import Markdown
 from quart import Quart, render_template, send_file
 
 app = Quart(__name__)
 app.config['SECRET_KEY'] = 'devel'
 
+Markdown(app)
 app.add_template_filter(base64.b64encode, 'b64encode')
 
 projects = {'icepap-ipassign':
             {'README.md': '/home/cydanil/icepap-ipassign/README.md',
              'GUI README': '/home/cydanil/icepap-ipassign/ipa_gui/gui.md'},
-            'alfie': {}
+            'alfie': {},
+            'rookie': {},
+            'rook': {},
+            'seagull': {},
+            'bluejay': {},
+            'pelican': {},
+            'ostrich': {},
             }
 
 
@@ -24,9 +33,14 @@ async def hello():
 
 @app.route('/retrieve/<filename>')
 async def retrieve(filename: bytes) -> str:
-    fname = base64.b64decode(filename)
-    html = await render_template('base.html')
-    html += fname.decode()
+    fname = base64.b64decode(filename).decode()
+    if fname.endswith('.md'):
+        with open(fname, 'r') as fin:
+            mkd = fin.read()
+        html = await render_template('render_md.html', mkd=mkd)
+    else:
+        html = await render_template('base.html')
+        html += fname
     return html
 
 
@@ -51,4 +65,4 @@ async def download(project_name: str):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
