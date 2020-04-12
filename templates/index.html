@@ -1,20 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% for name, documents in projects.items() %}
-        <div class="container rounded mt-2" style="border:1px solid #CECECE;">
-            <div class="row">
-                    <h2> {{ name }} </h2>
-                    {% if documents %}
-                    <a href="{{ url_for('download', project_name=name) }}"><h2><i class="fa fa-download"></i></h2></a>
-                    {% endif %}
-            </div> <!-- row -->
-            {% for docname, docloc in documents.items() %}
-                {% set encoded_fname = docloc.encode() | b64encode %}
-                {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
-                <br/>
-            {% endfor %}
-        </div> <!-- container -->
-    {% else %}
+    {% if not projects %}
         <h1> No project available </h1>
-    {% endfor %}
+    {% else %}
+        <div id="accordion">
+            {% for name, documents in projects.items() %}
+                {% set div_id = 'collapse-%s' % name %}
+                {% set heading_id = 'heading-%s' % name %}
+                <div class="card mt-2">
+                    <div class="card-header" id="{{ heading_id }}">
+                        <h5 class="mb-0">
+                          <button class="collapsed btn btn-link" data-toggle="collapse" data-target="#{{ div_id }}" aria-expanded="true" aria-controls="{{ heading_id }}">
+                                {{ name }}
+                                <!--
+                                {% if documents %}
+                                    <a href="{{ url_for('download', project_name=name) }}"><i class="fa fa-download"></i></a>
+                                {% endif %}
+                                -->
+                            </button>
+                        </h5>
+                    </div>  <!-- card-header -->
+                    <div id="{{ div_id }}" class="collapse" aria-labelledby={{ heading_id }}" data-parent="#accordion">
+                        <div class="card-body">
+                            {% for docname, docloc in documents.items() %}
+                                {% set encoded_fname = docloc.encode() | b64encode %}
+                                {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
+                                <br/>
+                            {% endfor %}
+                        </div> <!-- card-body -->
+                    </div> <!-- collapse -->
+                </div> <!-- card -->
+            {% endfor %}
+        </div> <!-- accordion -->
+    {% endif %}
 {% endblock %}
