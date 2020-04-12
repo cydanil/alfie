@@ -13,15 +13,26 @@ body {
 }
 
 .card {
-  border-color: deeppink;
+  border: none;
 }
 
 .card-header {
   background-color: #303030;
+  color: #FFFFE6;
 }
 
 .card-body {
   background-color: #444444;
+}
+
+.dropdown-menu,
+.dropdown-item {
+  background-color: #444444;
+  color: #FFCCCC;
+}
+.dropdown-item:hover {
+  background-color: #444444;
+  color: deeppink;
 }
 
 /* Modify brand and text colours */

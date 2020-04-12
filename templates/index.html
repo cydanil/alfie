@@ -10,29 +10,33 @@
                 <div class="card mt-2">
                     <div class="card-header" id="{{ heading_id }}">
                         <h5 class="mb-0">
-                          <button class="collapsed btn btn-link" data-toggle="collapse" data-target="#{{ div_id }}" aria-expanded="true" aria-controls="{{ heading_id }}">
+                            <button class="collapsed btn btn-link" data-toggle="collapse" data-target="#{{ div_id }}" aria-expanded="true" aria-controls="{{ heading_id }}">
                                 {{ name }}
-                                <!--
-                                {% if documents %}
-                                    <a href="{{ url_for('download', project_name=name) }}"><i class="fa fa-download"></i></a>
-                                {% endif %}
-                                -->
                             </button>
+                            {% if documents %}
+                                <button id="{{ name }}_export" type="button" class="btn btn-outline-warning stretched-link pull-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-download"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="{{ name }}_export">
+                                    <a class="dropdown-item" href="{{ url_for('export', project=name, zip=true) }}">export as zip file</a>
+                                    <a class="dropdown-item" href="{{ url_for('export', project=name, zip=false) }}">export as text file</a>
+                                </div>
+                            {% endif %}
                         </h5>
                     </div>  <!-- card-header -->
-                    <div id="{{ div_id }}" class="collapse" aria-labelledby={{ heading_id }}" data-parent="#accordion">
-                        <div class="card-body">
-                            {% for docname, docloc in documents.items() %}
-                                {% if docloc.startswith('http') %}
-                                  {{ docname }} : <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
-                                {% else %}
-                                    {% set encoded_fname = docloc.encode() | b64encode %}
-                                    {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
-                                {% endif %}
-                                <br/>
-                            {% endfor %}
-                        </div> <!-- card-body -->
-                    </div> <!-- collapse -->
+                    <div id="{{ div_id }}" class="collapse" aria-labelledby="{{ heading_id }}" data-parent="#accordion">
+                    <div class="card-body">
+                    {% for docname, docloc in documents.items() %}
+                        {% if docloc.startswith('http') %}
+                            {{ docname }} : <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
+                        {% else %}
+                            {% set encoded_fname = docloc.encode() | b64encode %}
+                            {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
+                        {% endif %}
+                        <br/>
+                    {% endfor %}
+                    </div> <!-- card-body -->
+                </div> <!-- collapse -->
                 </div> <!-- card -->
             {% endfor %}
         </div> <!-- accordion -->

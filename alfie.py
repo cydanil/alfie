@@ -4,7 +4,7 @@ import io
 import zipfile
 
 from flaskext.markdown import Markdown
-from quart import Quart, render_template, send_file
+from quart import Quart, request, render_template, send_file
 
 app = Quart(__name__)
 app.config['SECRET_KEY'] = 'devel'
@@ -45,40 +45,65 @@ async def retrieve(filename: bytes) -> str:
     return html
 
 
-@app.route('/download/<project_name>')
-async def download(project_name: str):
-    """Create a zip archive of a project.
+@app.route('/export')
+async def export():
+    """Export the project for download.
 
-    Zip the files from the storage path.
-    External resources (ie. link) are compiled into a external_resources.txt
-    file.
+    This url expect the project name as `project`, and an optional `zip`
+    boolean.
+
+    If `zip` is set, zip the files from the storage path.
+    External resources (ie. link) are then compiled into an
+    `external_resources.txt` file, itself appended to the archive.
+    Its format will be 'resource_name: resource_location'.
+
+    If `zip` is unset, then all resources in the project will be listed in
+    a text file in the same format as above, and this text file will be served
+    to the user.
     """
-    documents = projects[project_name]
+    project = request.args.get('project')
+    zip_files = request.args.get('zip', default=True)
+    zip_files = True if zip_files in ['True', True] else False
 
+    print(request.args, f'zip_files: {type(zip_files)}')
+
+    documents = projects[project]
+    attachment_filename = project
     file_ = io.BytesIO()
-    externals = []
-    with zipfile.ZipFile(file_, 'w') as zf:
-        for filename, location in documents.items():
-            if location.startswith('http'):
-                externals.append((filename, location))
-                continue
-            # Sanitize the file name
-            fname = filename.replace(' ', '_')
-            fname_ext = fname.split('.')[-1]
-            loc_ext = location.split('.')[-1]
-            if fname_ext != loc_ext:
-                fname = f'{fname}.{loc_ext}'
-            # Write the file
-            zf.write(location, fname)
 
-        # Handle external resources
-        if externals:
-            content = '\n'.join(f'{name}: {uri}' for name, uri in externals)
-            zf.writestr('external_resources.txt', content)
+    if zip_files:
+        attachment_filename += '.zip'
+        mimetype = 'application/zip'
+        externals = []
+        with zipfile.ZipFile(file_, 'w') as zf:
+            for filename, location in documents.items():
+                if location.startswith('http'):
+                    externals.append((filename, location))
+                    continue
+                # Sanitize the file name
+                fname = filename.replace(' ', '_')
+                fname_ext = fname.split('.')[-1]
+                loc_ext = location.split('.')[-1]
+                if fname_ext != loc_ext:
+                    fname = f'{fname}.{loc_ext}'
+                # Write the file
+                zf.write(location, fname)
+
+            # Handle external resources
+            if externals:
+                zf.writestr('external_resources.txt',
+                            '\n'.join(f'{n}: {uri}' for n, uri in externals))
+    else:
+        attachment_filename += '.txt'
+        content = '\n'.join([f'{fname}: {loc}' for fname, loc
+                             in documents.items()])
+        file_.write(content.encode())
+        mimetype = 'text/csv'
 
     file_.seek(0)
     ret = await send_file(file_,
-                          attachment_filename=f'{project_name}.zip',
+                          attachment_filename=attachment_filename,
+                          mimetype=mimetype,
                           as_attachment=True)
     return ret
 
