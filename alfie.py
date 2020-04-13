@@ -1,13 +1,14 @@
 import quart.flask_patch  # noqa, required by Quart.
 
 import io
+import os
 import zipfile
 
 from flaskext.markdown import Markdown
 from quart import Quart, request, render_template, send_file
 
 app = Quart(__name__)
-app.config['SECRET_KEY'] = 'devel'
+app.config['SECRET_KEY'] = os.environ['ALFIE_SECRET']
 
 Markdown(app)
 

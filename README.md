@@ -12,6 +12,17 @@ Alfie will allow to export all documents related to a project in one click.
 The aim is to hook [pandoc](https://pandoc.org/) up to convert and store the
 documents in one unified format.
 
+# Environment
+
+The application secret should be set in the `ALFIE_SECRET` environment variable.
+A good way to generate one is:
+
+```bash
+$ export ALFIE_SECRET=`shuf -zer -n20 {A..Z} {a..z} {0..9}`
+$ export QUART_APP=alfie:app
+$ quart run
+```
+
 # Jinja, HTML, and CSS Conventions
 
 The `static/css/master.css` file should be alphabetically ordered.
