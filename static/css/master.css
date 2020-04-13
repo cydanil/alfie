@@ -1,45 +1,15 @@
-/* Navbar colours */ 
-.navbar-custom { 
-  background-color: #303030;
-} 
+a {
+  color: #FFCCCC;
+}
+a:hover {
+  color: deeppink;
+  text-decoration: none;
+}
 
 body {
   background-color: #444444;
   color: #FFFFE6;
 }
-
-::selection {
-  background-color: #8EBF42;
-}
-
-.card {
-  border: none;
-}
-
-.card-header {
-  background-color: #303030;
-  color: #FFFFE6;
-}
-
-.card-body {
-  background-color: #444444;
-}
-
-.dropdown-menu,
-.dropdown-item {
-  background-color: #444444;
-  color: #FFCCCC;
-}
-.dropdown-item:hover {
-  background-color: #444444;
-  color: deeppink;
-}
-
-/* Modify brand and text colours */
-.navbar-custom .navbar-brand, 
-.navbar-custom .navbar-text { 
-  color: deeppink;
-} 
 
 .btn.btn-outline-warning {
   color: deeppink;
@@ -55,26 +25,49 @@ body {
   border-color: deeppink;
 }
 
-/* Link colours */
-a {
-  color: #FFCCCC;
-}
-a:hover {
-  color: deeppink;
-  text-decoration: none;
-}
-
 .btn-link,
 .btn-link:hover {
   color: #8EBF42;
   text-decoration: none;
 }
 
-/* Used when rendering sources */
-pre {
+.card {
+  border: none;
+}
+
+.card-body {
+  background-color: #444444;
+}
+
+.card-header {
+  background-color: #303030;
+  color: #FFFFE6;
+}
+
+.dropdown-item:hover {
+  background-color: #444444;
   color: deeppink;
 }
 
-.deeppink::selection {
+.dropdown-menu,
+.dropdown-item {
   background-color: #444444;
+  color: #FFCCCC;
+}
+
+.navbar-custom { 
+  background-color: #303030;
+} 
+
+.navbar-custom .navbar-brand, 
+.navbar-custom .navbar-text { 
+  color: deeppink;
+} 
+
+pre {  /* Used when rendering sources */
+  color: deeppink;
+}
+
+::selection {
+  background-color: #8EBF42;
 }
