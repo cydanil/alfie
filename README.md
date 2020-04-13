@@ -1,3 +1,5 @@
+![tests](https://github.com/cydanil/alfie/workflows/tests/badge.svg)
+
 # Alfie
 
 A List of Facts and Information ('til I find a better backronym).
@@ -12,7 +14,7 @@ Alfie will allow to export all documents related to a project in one click.
 The aim is to hook [pandoc](https://pandoc.org/) up to convert and store the
 documents in one unified format.
 
-# Environment
+## Environment
 
 The application secret should be set in the `ALFIE_SECRET` environment variable.
 A good way to generate one is:
@@ -23,7 +25,7 @@ $ export QUART_APP=alfie:app
 $ quart run
 ```
 
-# Jinja, HTML, and CSS Conventions
+## Jinja, HTML, and CSS Conventions
 
 The `static/css/master.css` file should be alphabetically ordered.
 
@@ -42,3 +44,13 @@ Closing div tags that are further than 3 lines away for the opening tag should h
 ```
 
 HTML files should be lint using [jinja-lint](https://github.com/motet-a/jinjalint)
+
+## Testing
+
+Testing is done with pytest and pytest-asyncio:
+
+```bash
+$ ALFIE_SECRET='pytest' pytest -vv --disable-pytest-warnings
+```
+
+pytest warning are disabled, as documented in [pytest-asyncio issue #141](https://github.com/pytest-dev/pytest-asyncio/issues/141)

@@ -90,7 +90,10 @@ async def export():
                 if fname_ext != loc_ext:
                     fname = f'{fname}.{loc_ext}'
                 # Write the file
-                zf.write(location, fname)
+                try:
+                    zf.write(location, fname)
+                except FileNotFoundError:
+                    continue  # TODO: flash a message
 
             # Handle external resources
             if externals:

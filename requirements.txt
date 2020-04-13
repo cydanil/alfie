@@ -1,2 +1,4 @@
 quart
 Flask-Markdown
+pytest
+pytest-asyncio
