@@ -14,7 +14,7 @@
                                 {{ name }}
                             </button>
                             {% if documents %}
-                                <button id="{{ name }}_export" type="button" class="btn btn-outline-warning stretched-link pull-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button id="{{ name }}_export" type="button" class="btn btn-outline-warning stretched-link pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-download"></i>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="{{ name }}_export">
@@ -30,8 +30,7 @@
                         {% if docloc.startswith('http') %}
                             {{ docname }} : <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
                         {% else %}
-                            {% set encoded_fname = docloc.encode() | b64encode %}
-                            {{ docname }} : <a href="{{ url_for('retrieve', filename=encoded_fname) }}"> {{ docloc }} </a>
+                            {{ docname }} : <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docloc }} </a>
                         {% endif %}
                         <br/>
                     {% endfor %}
