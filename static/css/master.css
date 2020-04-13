@@ -1,0 +1,73 @@
+a {
+  color: #FFCCCC;
+}
+a:hover {
+  color: deeppink;
+  text-decoration: none;
+}
+
+body {
+  background-color: #444444;
+  color: #FFFFE6;
+}
+
+.btn.btn-outline-warning {
+  color: deeppink;
+  border-color: deeppink;
+}
+
+.btn.btn-outline-warning:hover,
+.btn.btn-outline-warning:focus,
+.btn.btn-outline-warning:active,
+.btn.btn-outline-warning.active {
+  color: #ffffff;
+  background-color: deeppink;
+  border-color: deeppink;
+}
+
+.btn-link,
+.btn-link:hover {
+  color: #8EBF42;
+  text-decoration: none;
+}
+
+.card {
+  border: none;
+}
+
+.card-body {
+  background-color: #444444;
+}
+
+.card-header {
+  background-color: #303030;
+  color: #FFFFE6;
+}
+
+.dropdown-item:hover {
+  background-color: #444444;
+  color: deeppink;
+}
+
+.dropdown-menu,
+.dropdown-item {
+  background-color: #444444;
+  color: #FFCCCC;
+}
+
+.navbar-custom { 
+  background-color: #303030;
+} 
+
+.navbar-custom .navbar-brand, 
+.navbar-custom .navbar-text { 
+  color: deeppink;
+} 
+
+pre {  /* Used when rendering sources */
+  color: deeppink;
+}
+
+::selection {
+  background-color: #8EBF42;
+}
