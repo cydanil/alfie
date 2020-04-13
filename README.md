@@ -1,3 +1,5 @@
+![tests](https://github.com/cydanil/alfie/workflows/tests/badge.svg)
+
 # Alfie
 
 A List of Facts and Information ('til I find a better backronym).
