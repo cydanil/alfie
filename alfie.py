@@ -12,11 +12,14 @@ app.config['SECRET_KEY'] = 'devel'
 Markdown(app)
 
 projects = {'icepap-ipassign':
-            {'README.md': '/home/cydanil/icepap-ipassign/README.md',
+            {'README': '/home/cydanil/icepap-ipassign/README.md',
              'GUI README': '/home/cydanil/icepap-ipassign/ipa_gui/gui.md'},
             'alfie':
             {'Github': 'https://github.com/cydanil/alfie'},
-            'rookie': {},
+            'h5py':
+            {'Groups': '/home/cydanil/h5py/docs/high/group.rst',
+             'Files': '/home/cydanil/h5py/docs/high/file.rst',
+             'Build': '/home/cydanil/h5py/docs/build.rst'},
             'rook': {},
             'seagull': {},
             'bluejay': {},
@@ -62,14 +65,12 @@ async def export():
     a text file in the same format as above, and this text file will be served
     to the user.
     """
-    project = request.args.get('project')
+    project_name = request.args.get('project')
     zip_files = request.args.get('zip', default=True)
     zip_files = True if zip_files in ['True', True] else False
 
-    print(request.args, f'zip_files: {type(zip_files)}')
-
-    documents = projects[project]
-    attachment_filename = project
+    project = projects[project_name]
+    attachment_filename = project_name
     file_ = io.BytesIO()
 
     if zip_files:
@@ -77,7 +78,7 @@ async def export():
         mimetype = 'application/zip'
         externals = []
         with zipfile.ZipFile(file_, 'w') as zf:
-            for filename, location in documents.items():
+            for filename, location in project.items():
                 if location.startswith('http'):
                     externals.append((filename, location))
                     continue
@@ -97,7 +98,7 @@ async def export():
     else:
         attachment_filename += '.txt'
         content = '\n'.join([f'{fname}: {loc}' for fname, loc
-                             in documents.items()])
+                             in project.items()])
         file_.write(content.encode())
         mimetype = 'text/csv'
 

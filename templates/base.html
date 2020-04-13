@@ -33,9 +33,11 @@
             </div> <!-- navbar-collapse -->
         </nav>
   
-        {% for message in get_flashed_messages() %}
-            <div class="flash">{{ message }}</div>
-        {% endfor %}
+        <div class="flashes">
+            {% for message in get_flashed_messages() %}
+                <p class="lead">{{ message }}</p>
+            {% endfor %}
+        </div> <!-- flashes -->
         <div class="content">
             <div class="container">
                 {% block content %}
