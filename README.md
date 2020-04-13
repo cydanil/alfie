@@ -54,3 +54,7 @@ $ ALFIE_SECRET='pytest' pytest -vv --disable-pytest-warnings
 ```
 
 pytest warning are disabled, as documented in [pytest-asyncio issue #141](https://github.com/pytest-dev/pytest-asyncio/issues/141)
+
+## Sample test files source:
+
+doc and docx files come from: https://file-examples.com/index.php/sample-documents-download/sample-doc-download/

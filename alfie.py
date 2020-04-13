@@ -1,10 +1,12 @@
 import quart.flask_patch  # noqa, required by Quart.
 
+from asyncio import get_event_loop
 import io
 import os
 import zipfile
 
 from flaskext.markdown import Markdown
+import pypandoc
 from quart import Quart, request, render_template, send_file
 
 app = Quart(__name__)
@@ -21,7 +23,9 @@ projects = {'icepap-ipassign':
             {'Groups': '/home/cydanil/h5py/docs/high/group.rst',
              'Files': '/home/cydanil/h5py/docs/high/file.rst',
              'Build': '/home/cydanil/h5py/docs/build.rst'},
-            'rook': {},
+            'rook':
+            {'Sample docx file': '/home/cydanil/alfie/tests/test_data/file-sample_1MB.docx',
+             'Sample doc file': '/home/cydanil/alfie/tests/test_data/file-sample_1MB.doc'},
             'seagull': {},
             'bluejay': {},
             'pelican': {},
@@ -39,15 +43,18 @@ async def index():
 async def retrieve(filename: str) -> str:
     if not filename.startswith('/'):
         filename = '/' + filename
-
-    if filename.endswith('.md'):
-        with open(filename, 'r') as fin:
-            mkd = fin.read()
-        html = await render_template('render_md.html', mkd=mkd)
-    else:
-        html = await render_template('base.html')
-        html += filename
-    return html
+    loop = get_event_loop()
+    try:
+        content = await loop.run_in_executor(None,
+                                             pypandoc.convert_file,
+                                             filename, 'html')
+        ret = await render_template('render_md.html', content=content)
+    except RuntimeError:
+        with open(filename, 'rb') as fin:
+            file_ = fin.read()
+        ret = await send_file(file_,
+                              attachment_filename=filename)
+    return ret
 
 
 @app.route('/export')

@@ -1,4 +1,4 @@
 quart
-Flask-Markdown
+pypandoc
 pytest
 pytest-asyncio
