@@ -15,8 +15,8 @@
     <body>
         <nav class="navbar navbar-expand-lg sticky-top navbar-custom">
             <a class="navbar-brand" href="/">
-              <img src="{{ url_for('static', filename='logo.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
-              Alfie
+                <img src="{{ url_for('static', filename='logo.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+                Alfie
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -29,20 +29,18 @@
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-warning mr-sm-2 my-sm-0" type="submit">Search</button>
                 </form>
-                <button class="btn btn-outline-warning my-2 my-sm-0" type="button">Add Project</button>
+                <a class="btn btn-outline-warning my-2 my-sm-0" type="button" href="/new">Add Project</a>
             </div> <!-- navbar-collapse -->
         </nav>
-  
+ 
         <div class="flashes">
             {% for message in get_flashed_messages() %}
                 <p class="lead">{{ message }}</p>
             {% endfor %}
         </div> <!-- flashes -->
-        <div class="content">
-            <div class="container">
-                {% block content %}
-                {% endblock %}
-            </div> <!-- container -->
-        </div> <!-- content -->
+        <div class="container">
+        {% block content %}
+        {% endblock %}
+        </div> <!-- container -->
     </body>
 </html>
