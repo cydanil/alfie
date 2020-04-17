@@ -5,24 +5,28 @@ import io
 import os
 import zipfile
 
-from flaskext.markdown import Markdown
 import pypandoc
-from quart import Quart, request, render_template, send_file
+from quart import flash, Quart, request, render_template, send_file, url_for
+
+from definitions import (MEDIA_EXTENSIONS, OFFICE_EXTENSIONS,
+                         PANDOC_EXTENTIONS)
 
 app = Quart(__name__)
 app.config['SECRET_KEY'] = os.environ['ALFIE_SECRET']
-
-Markdown(app)
 
 projects = {'icepap-ipassign':
             {'README': '/home/cydanil/icepap-ipassign/README.md',
              'GUI README': '/home/cydanil/icepap-ipassign/ipa_gui/gui.md'},
             'alfie':
-            {'Github': 'https://github.com/cydanil/alfie'},
+            {'Github': 'https://github.com/cydanil/alfie',
+             'Page': '/home/cydanil/Downloads/Alfie.html'},
             'h5py':
             {'Groups': '/home/cydanil/h5py/docs/high/group.rst',
              'Files': '/home/cydanil/h5py/docs/high/file.rst',
              'Build': '/home/cydanil/h5py/docs/build.rst'},
+            'librashpa':
+            {'librashpa.pdf': '/home/cydanil/alfie/site/librashpadoc/librashpadoc.pdf',
+             'librashpa.html': '/home/cydanil/alfie/site/librashpadoc/html/index.html'},
             'rook':
             {'Sample docx file': '/home/cydanil/alfie/tests/test_data/file-sample_1MB.docx',
              'Sample doc file': '/home/cydanil/alfie/tests/test_data/file-sample_1MB.doc'},
@@ -41,19 +45,63 @@ async def index():
 
 @app.route('/retrieve/<path:filename>')
 async def retrieve(filename: str) -> str:
+    """Retrieve the files from a project.
+
+    The filename consists of a path to the file.
+
+    Various strategies are used depending on the file type:
+        - file types supported by pandoc are converted to html;
+        - PDFs are rendered using an iframe, letting the browser do the work;
+        - .doc files are either converted to docx (if soffice is available)
+          then converted using pandoc, or else served as files to download;
+        - media files are served as files.
+    """
     if not filename.startswith('/'):
         filename = '/' + filename
-    loop = get_event_loop()
-    try:
-        content = await loop.run_in_executor(None,
-                                             pypandoc.convert_file,
-                                             filename, 'html')
-        ret = await render_template('render_md.html', content=content)
-    except RuntimeError:
-        with open(filename, 'rb') as fin:
-            file_ = fin.read()
-        ret = await send_file(file_,
-                              attachment_filename=filename)
+
+    extension = filename.split('.')[-1].lower()
+    if extension in PANDOC_EXTENTIONS:
+        loop = get_event_loop()
+        try:
+            content = await loop.run_in_executor(None,
+                                                 pypandoc.convert_file,
+                                                 filename,
+                                                 'html')
+            ret = await render_template('render.html', content=content)
+        except RuntimeError as e:
+            ret = await render_template('base.html')
+            ret += str(e)
+
+    elif extension in OFFICE_EXTENSIONS or extension in MEDIA_EXTENSIONS:
+        ret = await send_file(filename, attachment_filename=filename)
+
+    elif extension == 'pdf':
+        await flash('This is not done yet!')
+        url = url_for('pdf', filename=filename)
+        content = f'<embed src="{url}" type="application/pdf#view=FitH" width="actual-width.px" height="actual-height.px"></embed>'
+        ret = await render_template('render.html', content=content)
+
+    elif extension == 'html':
+        with open(filename, 'r') as fin:
+            content = fin.read()
+        ret = await render_template('render.html', content=content)
+    else:
+        return
+
+    return ret
+
+
+@app.route('/pdf/<path:filename>')
+async def pdf(filename=None):
+    if filename is None:
+        return
+    if not filename.startswith('/'):
+        filename = '/' + filename
+
+    ret = await send_file(filename,
+                          attachment_filename=filename,
+                          mimetype='application/pdf',
+                          as_attachment=False)
     return ret
 
 
