@@ -6,8 +6,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import alfie  # noqa: import not at top of file
 alfie.projects = {'icepap-ipassign':
-                  {'README': 'tests/test_data/ipa/README.md',
-                   'GUI README': 'tests/test_data/ipa/gui/gui.md'}
+                  {'README': ('tests/test_data/ipa/README.md',
+                              'Full project readme'),
+                   'GUI README': ('tests/test_data/ipa/gui/gui.md',
+                                  'Qt GUI implementation details')}
                   }
 
 from alfie import app  # noqa: import not at top of file
@@ -31,10 +33,11 @@ async def test_export_data():
     assert response.status_code == 200
 
     data = await response.get_data()
-    assert data.startswith(b'\x50\x4b\x03\x04')  # PK zip file header
+    assert data.startswith(b'\x50\x4b')  # PK zip file header
 
     # Test handling (skipping) inaccessible files ok.
-    alfie.projects['icepap-ipassign']['notafile'] = 'not/a/dir/not/a/file.txt'
+    alfie.projects['icepap-ipassign']['notafile'] = ('no/dir/not/a/file.txt',
+                                                     '')
     response = await client.get('/export?project=icepap-ipassign&zip=True')
     assert response.status_code == 200
 

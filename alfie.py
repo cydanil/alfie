@@ -55,6 +55,36 @@ async def index():
     return html
 
 
+@app.route('/add', methods=['POST'])
+async def add():
+    """Add an entry to a project.
+
+    The arguments must be:
+        project str: the name of the project where to add the new entry to
+        name str: the name/key of the entry in the project.
+                  This name will be used when exporting the project.
+        location str: the document's URI
+        description str: a short summary of the file. Typically used to get
+                        a quick glance of the file. This is also used when
+                        searching.
+    """
+    form = await request.form
+
+    try:
+        project_name = form['project']
+        doc_name = form['name']
+        doc_loc = form['location']
+        description = form['description']
+    except KeyError:
+        await flash('Could not add content')
+    else:
+        projects[project_name][doc_name] = (doc_loc, description)
+
+    # TODO: redirect to the correct card in accordion
+    ret = redirect(url_for('index'))
+    return ret
+
+
 @app.route('/retrieve/<path:filename>')
 async def retrieve(filename: str) -> str:
     """Retrieve the files from a project.
@@ -103,28 +133,6 @@ async def retrieve(filename: str) -> str:
     return ret
 
 
-@app.route('/add', methods=['POST'])
-async def add():
-    """Add an entry to a project."""
-
-    content = await request.form
-
-    try:
-        project_name = content['project']
-        doc_name = content['name']
-        doc_loc = content['location']
-        description = content['description']
-    except KeyError:
-        print(content, content.keys())
-        await flash('Could not add content')
-    else:
-        projects[project_name][doc_name] = (doc_loc, description)
-
-    # TODO: redirect to the correct card in accordion
-    ret = redirect(url_for('index'))
-    return ret
-
-
 @app.route('/pdf/<path:filename>')
 async def pdf(filename=None):
     if filename is None:
@@ -168,7 +176,7 @@ async def export():
         mimetype = 'application/zip'
         externals = []
         with zipfile.ZipFile(file_, 'w') as zf:
-            for filename, location in project.items():
+            for filename, (location, description) in project.items():
                 if location.startswith('http'):
                     externals.append((filename, location))
                     continue
@@ -190,7 +198,7 @@ async def export():
                             '\n'.join(f'{n}: {uri}' for n, uri in externals))
     else:
         attachment_filename += '.txt'
-        content = '\n'.join([f'{fname}: {loc}' for fname, loc
+        content = '\n'.join([f'{fname}: {loc}' for fname, (loc, _)
                              in project.items()])
         file_.write(content.encode())
         mimetype = 'text/csv'

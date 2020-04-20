@@ -27,11 +27,11 @@
                         </div>
                         {% for docname, (docloc, desc) in documents.items() %}
                             {% if docloc.startswith('http') %}
-                                <a href="{{ docloc }}" target="_blank">{{ docname }}</a>: {{ desc }}
+                                {{ docname }}: <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
                             {% else %}
-                                <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docname }} </a>: {{ desc }}
+                                {{ docname }}: <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docloc }} </a>
                             {% endif %}
-                            <br/>
+                            <div class="container"> {{ desc }} </div>
                         {% endfor %}
                     {% endif %}
                     <button id="{{ name }}_plus" type="button" class="btn btn-outline-warning stretched-link pull-right" data-toggle="modal" data-target="#{{ name }}_add">
