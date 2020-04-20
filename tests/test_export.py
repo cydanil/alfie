@@ -42,4 +42,4 @@ async def test_export_data():
     assert response.status_code == 200
 
     data = await response.get_data()
-    assert data.startswith(b'\x50\x4b\x03\x04')  # PK zip file header
+    assert data.startswith(b'\x50\x4b')  # PK zip file header
