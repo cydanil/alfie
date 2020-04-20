@@ -32,15 +32,28 @@
                 <a class="btn btn-outline-warning my-2 my-sm-0" type="button" href="/new">Add Project</a>
             </div> <!-- navbar-collapse -->
         </nav>
- 
-        <div class="flashes">
-            {% for message in get_flashed_messages() %}
-                <p class="lead">{{ message }}</p>
-            {% endfor %}
-        </div> <!-- flashes -->
+
+        {% with flashes = get_flashed_messages() %}
+            {% if flashes %}
+                <div class="container my-2">
+                    <div class="alert alert-danger">
+                        {% for message in flashes %}
+                            <center><span id="blinker"> {{ message }} </span></center>
+                        {% endfor %}
+                    </div> <!-- alert -->
+                </div> <!-- container -->
+                <script>
+                    var blink_speed = 200;
+                    var t = setInterval(function () {
+                        var ele = document.getElementById('blinker');
+                        ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden');
+                        }, blink_speed);
+                </script>
+            {% endif %}
+        {% endwith %}
         <div class="container">
-        {% block content %}
-        {% endblock %}
+            {% block content %}
+            {% endblock %}
         </div> <!-- container -->
     </body>
 </html>
