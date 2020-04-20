@@ -16,22 +16,32 @@ app = Quart(__name__)
 app.config['SECRET_KEY'] = os.environ['ALFIE_SECRET']
 
 projects = {'icepap-ipassign':
-            {'README': '/home/cydanil/icepap-ipassign/README.md',
-             'GUI README': '/home/cydanil/icepap-ipassign/ipa_gui/gui.md'},
+            {'README': ('/home/cydanil/icepap-ipassign/README.md',
+                        'Complete ipassign documentation'),
+             'GUI README': ('/home/cydanil/icepap-ipassign/ipa_gui/gui.md',
+                            'Qt Gui development documentation')},
             'alfie':
-            {'Github': 'https://github.com/cydanil/alfie',
-             'Page': '/home/cydanil/Downloads/Alfie.html'},
+            {'Page': ('/home/cydanil/Downloads/Alfie.html',
+                      'Alfie homepage')},
             'h5py':
-            {'Groups': '/home/cydanil/h5py/docs/high/group.rst',
-             'Files': '/home/cydanil/h5py/docs/high/file.rst',
-             'Build': '/home/cydanil/h5py/docs/build.rst'},
+            {'Groups': ('/home/cydanil/h5py/docs/high/group.rst',
+                        'hdf5 groups manual'),
+             'Files': ('/home/cydanil/h5py/docs/high/file.rst',
+                       'hdf5 files manual'),
+             'Build': ('/home/cydanil/h5py/docs/build.rst',
+                       'hdf5 build how-to')},
             'librashpa':
-            {'librashpa.pdf': '/home/cydanil/alfie/site/librashpadoc/librashpadoc.pdf',
-             'librashpa.html': '/home/cydanil/alfie/site/librashpadoc/html/index.html'},
+            {'librashpa.pdf': ('/home/cydanil/alfie/site/librashpadoc/librashpadoc.pdf',
+                               'librashpa output pdf documentation'),
+             'librashpa.html': ('/home/cydanil/alfie/site/librashpadoc/html/index.html',
+                                'librashpa html documentation')},
             'rook':
-            {'Sample docx file': '/home/cydanil/alfie/tests/test_data/file-sample_1MB.docx',
-             'Sample doc file': '/home/cydanil/alfie/tests/test_data/file-sample_1MB.doc'},
-            'seagull': {},
+            {'Sample docx file': ('/home/cydanil/alfie/tests/test_data/file-sample_1MB.docx',
+                                  'Test microsoft docx file handling'),
+             'Sample doc file': ('/home/cydanil/alfie/tests/test_data/file-sample_1MB.doc',
+                                 'Test legacy doc file handling')},
+            'seagull': {'WHIST CE': ('https://alfresco.esrf.fr/share/page/site/ce-certification-wg/document-details?nodeRef=workspace://SpacesStore/789b28d6-6111-4fbd-b7dc-545406886f26',
+                                     'WHIST certification documentation (alfresco)')},
             'bluejay': {},
             'pelican': {},
             'ostrich': {},
@@ -39,6 +49,7 @@ projects = {'icepap-ipassign':
 
 
 @app.route('/')
+@app.route('/index')
 async def index():
     html = await render_template('index.html', projects=projects)
     return html
@@ -100,14 +111,14 @@ async def add():
 
     try:
         project_name = content['project']
-        name = content['name']
-        location = content['location']
-        # description = content['description']
+        doc_name = content['name']
+        doc_loc = content['location']
+        description = content['description']
     except KeyError:
         print(content, content.keys())
         await flash('Could not add content')
     else:
-        projects[project_name][name] = location
+        projects[project_name][doc_name] = (doc_loc, description)
 
     # TODO: redirect to the correct card in accordion
     ret = redirect(url_for('index'))

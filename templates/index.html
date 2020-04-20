@@ -25,11 +25,11 @@
                             <a class="dropdown-item" href="{{ url_for('export', project=name, zip=true) }}">export as zip file</a>
                             <a class="dropdown-item" href="{{ url_for('export', project=name, zip=false) }}">export as text file</a>
                         </div>
-                        {% for docname, docloc in documents.items() %}
+                        {% for docname, (docloc, desc) in documents.items() %}
                             {% if docloc.startswith('http') %}
-                                {{ docname }} : <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
+                                <a href="{{ docloc }}" target="_blank">{{ docname }}</a>: {{ desc }}
                             {% else %}
-                                {{ docname }} : <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docloc }} </a>
+                                <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docname }} </a>: {{ desc }}
                             {% endif %}
                             <br/>
                         {% endfor %}
