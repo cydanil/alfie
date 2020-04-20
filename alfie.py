@@ -6,7 +6,8 @@ import os
 import zipfile
 
 import pypandoc
-from quart import flash, Quart, request, render_template, send_file, url_for
+from quart import (flash, Quart, redirect, request, render_template, send_file,
+                   url_for)
 
 from definitions import (MEDIA_EXTENSIONS, OFFICE_EXTENSIONS,
                          PANDOC_EXTENTIONS)
@@ -88,6 +89,28 @@ async def retrieve(filename: str) -> str:
     else:
         return
 
+    return ret
+
+
+@app.route('/add', methods=['POST'])
+async def add():
+    """Add an entry to a project."""
+
+    content = await request.form
+
+    try:
+        project_name = content['project']
+        name = content['name']
+        location = content['location']
+        # description = content['description']
+    except KeyError:
+        print(content, content.keys())
+        await flash('Could not add content')
+    else:
+        projects[project_name][name] = location
+
+    # TODO: redirect to the correct card in accordion
+    ret = redirect(url_for('index'))
     return ret
 
 

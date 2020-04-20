@@ -63,6 +63,13 @@ code::selection {
   color: #FFCCCC;
 }
 
+.modal-header {
+  color: #444444;
+}
+
+.modal-footer {
+  color: #444444;
+}
 .modal-body {
   color: #444444;
 }
