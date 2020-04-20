@@ -55,6 +55,25 @@ async def index():
     return html
 
 
+@app.route('/create', methods=['POST'])
+async def create():
+    """Create a new project in the database."""
+
+    form = await request.form
+    name = form.get('name')
+
+    if name is None:
+        await flash('Did not specify a project name')
+    elif name in projects:
+        await flash('This project already exists')
+    else:
+        projects[name] = {}
+
+    # TODO: redirect to the correct card in accordion
+    ret = redirect(url_for('index'))
+    return ret
+
+
 @app.route('/add', methods=['POST'])
 async def add():
     """Add an entry to a project.
