@@ -105,6 +105,31 @@ async def add():
     return ret
 
 
+@app.route('/remove', methods=['POST'])
+async def remove():
+    """Remove an entry from a project.
+
+    This post method expects the keys `project` and `document` in it, both
+    strings.
+    The document should refer to a key within the project.
+    """
+    form = await request.form
+
+    try:
+        document = form['document']
+        project = form['project']
+
+        projects[project].pop(document)
+    except KeyError:
+        await flash('Could not remove document')
+    else:
+        await flash(f'{document} removed from {project}')
+
+    # TODO: redirect to the correct card in accordion
+    ret = redirect(url_for('index'))
+    return ret
+
+
 @app.route('/retrieve/<path:filename>')
 async def retrieve(filename: str) -> str:
     """Retrieve the files from a project.

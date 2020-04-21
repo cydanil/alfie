@@ -60,8 +60,10 @@ async def test_add_to_project():
                                                'description': description,
                                                'project': project})
     page = await response.get_data()
-
     assert b'<title>Redirect</title>' in page
+
+    assert name in alfie.projects[project].keys()
+    assert alfie.projects[project][name] == (location, description)
 
     response = await client.get('/index')
     page = (await response.get_data()).decode()
@@ -72,6 +74,28 @@ async def test_add_to_project():
 
 
 @pytest.mark.asyncio
+async def test_remove_from_project():
+    client = app.test_client()
+    project = 'icepap-ipassign'
+    name = 'Mock File'
+    location = '/whatever/place/file.rst'
+    description = 'Not a real file, just testing that entries are removed ok'
+
+    alfie.projects[project][name] = (location, description)
+
+    response = await client.post('/remove', form={'document': name,
+                                                  'project': project})
+    page = await response.get_data()
+    assert b'<title>Redirect</title>' in page
+
+    assert name not in alfie.projects[project].keys()
+
+    response = await client.get('/index')
+    page = (await response.get_data()).decode()
+    assert f'{name} removed from {project}' in page
+
+
+@pytest.mark.asyncio
 async def test_add_project():
     client = app.test_client()
 
@@ -79,6 +103,8 @@ async def test_add_project():
     page = await response.get_data()
 
     assert b'<title>Redirect</title>' in page
+
+    assert 'cuckoo' in alfie.projects.keys()
 
     response = await client.get('/index')
     page = (await response.get_data()).decode()
