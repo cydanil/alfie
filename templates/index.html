@@ -36,7 +36,7 @@
 
                                         <form action="{{ url_for('remove') }}" method="post" >
                                             <div class="modal-body">
-                                                This will remove {{ docname }} from {{ name }}.
+                                                This will remove <strong>{{ docname }}</strong> from {{ name }}.
                                                 <div class="form-group">
                                                 <textarea class="form-control" name="document" style="display:none;">{{ docname }}</textarea>
                                                 </div>
@@ -115,4 +115,11 @@
             {% endfor %}
         </div> <!-- accordion -->
     {% endif %}
+    <script>
+        if (window.location.hash) {
+            var div_id = '#collapse-' + window.location.hash.substring(1);
+            $(div_id).addClass('show');
+            document.getElementById(div_id.substring(1)).scrollIntoView();
+        }
+    </script>
 {% endblock %}

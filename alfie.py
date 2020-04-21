@@ -70,8 +70,7 @@ async def create():
         projects[name] = {}
         await flash(f'{name} successfully added')
 
-    # TODO: redirect to the correct card in accordion
-    ret = redirect(url_for('index'))
+    ret = redirect(f'{url_for("index")}#{name}')
     return ret
 
 
@@ -91,17 +90,16 @@ async def add():
     form = await request.form
 
     try:
-        project_name = form['project']
-        doc_name = form['name']
-        doc_loc = form['location']
+        project = form['project']
+        name = form['name']
+        loc = form['location']
         description = form.get('description', '')
     except KeyError:
         await flash('Could not add content')
     else:
-        projects[project_name][doc_name] = (doc_loc, description)
+        projects[project][name] = (loc, description)
 
-    # TODO: redirect to the correct card in accordion
-    ret = redirect(url_for('index'))
+    ret = redirect(f'{url_for("index")}#{project}')
     return ret
 
 
@@ -125,8 +123,7 @@ async def remove():
     else:
         await flash(f'{document} removed from {project}')
 
-    # TODO: redirect to the correct card in accordion
-    ret = redirect(url_for('index'))
+    ret = redirect(f'{url_for("index")}#{project}')
     return ret
 
 
