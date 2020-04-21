@@ -68,6 +68,7 @@ async def create():
         await flash('This project already exists')
     else:
         projects[name] = {}
+        await flash(f'{name} successfully added')
 
     # TODO: redirect to the correct card in accordion
     ret = redirect(url_for('index'))
@@ -93,7 +94,7 @@ async def add():
         project_name = form['project']
         doc_name = form['name']
         doc_loc = form['location']
-        description = form['description']
+        description = form.get('description', '')
     except KeyError:
         await flash('Could not add content')
     else:
