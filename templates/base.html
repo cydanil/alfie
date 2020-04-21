@@ -29,18 +29,57 @@
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-warning mr-sm-2 my-sm-0" type="submit">Search</button>
                 </form>
-                <a class="btn btn-outline-warning my-2 my-sm-0" type="button" href="/new">Add Project</a>
+                <button type="button" class="btn btn-outline-warning my-2 my-sm-0" data-toggle="modal" data-target="#create_project">
+                    Add project
+                </button>
             </div> <!-- navbar-collapse -->
         </nav>
- 
-        <div class="flashes">
-            {% for message in get_flashed_messages() %}
-                <p class="lead">{{ message }}</p>
-            {% endfor %}
-        </div> <!-- flashes -->
+
+        <div class="modal" id="create_project" role="dialog" aria-labelledby="create_project" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="create_project">Create New Project</h5>
+                    </div>
+
+                    <form action="{{ url_for('create') }}" method="post" >
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="name" class="col-form-label">Name:</label>
+                                <input type="text" class="form-control" name="name">
+                            </div>
+                        </div> <!-- modal-body -->
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-outline-warning">Add</button>
+                        </div>
+                    </form>
+                </div> <!-- modal content -->
+            </div> <!-- modal-dialog -->
+        </div> <!-- modal -->
+
+        {% with flashes = get_flashed_messages() %}
+            {% if flashes %}
+                <div class="container my-2">
+                    <div class="alert alert-danger">
+                        {% for message in flashes %}
+                            <center><span id="blinker"> {{ message }} </span></center>
+                        {% endfor %}
+                    </div> <!-- alert -->
+                </div> <!-- container -->
+                <script>
+                    var blink_speed = 200;
+                    var t = setInterval(function () {
+                        var ele = document.getElementById('blinker');
+                        ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden');
+                        }, blink_speed);
+                </script>
+            {% endif %}
+        {% endwith %}
         <div class="container">
-        {% block content %}
-        {% endblock %}
+            {% block content %}
+            {% endblock %}
         </div> <!-- container -->
     </body>
 </html>

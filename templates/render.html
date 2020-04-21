@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- The expected input is an html string that we let jinja intepret -->
+    {{ content | safe }}
+{% endblock %}

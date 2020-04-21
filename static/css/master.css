@@ -1,3 +1,7 @@
+::selection {
+  background-color: #8EBF42;
+}
+
 a {
   color: #FFCCCC;
 }
@@ -9,6 +13,12 @@ a:hover {
 body {
   background-color: #444444;
   color: #FFFFE6;
+}
+
+.btn-link,
+.btn-link:hover {
+  color: #8EBF42;
+  text-decoration: none;
 }
 
 .btn.btn-outline-warning {
@@ -25,12 +35,6 @@ body {
   border-color: deeppink;
 }
 
-.btn-link,
-.btn-link:hover {
-  color: #8EBF42;
-  text-decoration: none;
-}
-
 .card {
   border: none;
 }
@@ -44,30 +48,49 @@ body {
   color: #FFFFE6;
 }
 
+code {
+  color: #8EBF42;
+}
+
+code::selection {
+  color: #FFFFE6;
+}
+
 .dropdown-item:hover {
   background-color: #444444;
   color: deeppink;
 }
 
-.dropdown-menu,
-.dropdown-item {
+.dropdown-item,
+.dropdown-menu {
   background-color: #444444;
   color: #FFCCCC;
 }
 
-.navbar-custom { 
-  background-color: #303030;
-} 
+.modal-body,
+.modal-footer,
+.modal-header,
+.modal-title {
+  color: #444444;
+}
 
 .navbar-custom .navbar-brand, 
 .navbar-custom .navbar-text { 
   color: deeppink;
 } 
 
+.navbar-custom { 
+  background-color: #303030;
+} 
+
 pre {  /* Used when rendering sources */
-  color: deeppink;
+  color: #8EBF42;
 }
 
-::selection {
-  background-color: #8EBF42;
+pre::selection {
+  color: #FFFFE6;
+}
+
+span::selection {
+  color: #FFFFE6;
 }

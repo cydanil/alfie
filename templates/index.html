@@ -13,30 +13,70 @@
                             <button class="collapsed btn btn-link" data-toggle="collapse" data-target="#{{ div_id }}" aria-expanded="true" aria-controls="{{ heading_id }}">
                                 {{ name }}
                             </button>
-                            {% if documents %}
-                                <button id="{{ name }}_export" type="button" class="btn btn-outline-warning stretched-link pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-download"></i>
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="{{ name }}_export">
-                                    <a class="dropdown-item" href="{{ url_for('export', project=name, zip=true) }}">export as zip file</a>
-                                    <a class="dropdown-item" href="{{ url_for('export', project=name, zip=false) }}">export as text file</a>
-                                </div>
-                            {% endif %}
                         </h5>
                     </div> <!-- card-header -->
                     <div id="{{ div_id }}" class="collapse" aria-labelledby="{{ heading_id }}" data-parent="#accordion">
                     <div class="card-body">
-                    {% for docname, docloc in documents.items() %}
-                        {% if docloc.startswith('http') %}
-                            {{ docname }} : <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
-                        {% else %}
-                            {{ docname }} : <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docloc }} </a>
-                        {% endif %}
-                        <br/>
-                    {% endfor %}
+                    {% if documents %}
+                        <button id="{{ name }}_export" type="button" class="btn btn-outline-warning stretched-link pull-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-download"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="{{ name }}_export">
+                            <a class="dropdown-item" href="{{ url_for('export', project=name, zip=true) }}">export as zip file</a>
+                            <a class="dropdown-item" href="{{ url_for('export', project=name, zip=false) }}">export as text file</a>
+                        </div>
+                        {% for docname, (docloc, desc) in documents.items() %}
+                            {% if docloc.startswith('http') %}
+                                {{ docname }}: <a href="{{ docloc }}" target="_blank">{{ docloc }}</a>
+                            {% else %}
+                                {{ docname }}: <a href="{{ url_for('retrieve', filename=docloc) }}"> {{ docloc }} </a>
+                            {% endif %}
+                            <div class="container"> {{ desc }} </div>
+                        {% endfor %}
+                    {% endif %}
+                    <button id="{{ name }}_plus" type="button" class="btn btn-outline-warning stretched-link pull-right" data-toggle="modal" data-target="#{{ name }}_add">
+                    <i class="fa fa-plus"></i>
+                    </button>
+                    <br/>
                     </div> <!-- card-body -->
                 </div> <!-- collapse -->
                 </div> <!-- card -->
+
+                <div class="modal" id="{{ name }}_add" role="dialog" aria-labelledby="{{ name }}_add" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="{{ name }}_add">Add to {{ name }}</h5>
+                            </div>
+
+                            <form action="{{ url_for('add') }}" method="post" >
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="name" class="col-form-label">Name:</label>
+                                        <input type="text" class="form-control" name="name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="location" class="col-form-label">Location:</label>
+                                        <input type="text" class="form-control" name="location">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="description" class="col-form-label">Description:</label>
+                                        <textarea class="form-control" name="description"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="project" style="display:none;">{{ name }}</textarea>
+                                    </div>
+
+                                </div> <!-- modal-body -->
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-outline-warning">Add</button>
+                                </div>
+                            </form>
+                        </div> <!-- modal content -->
+                    </div> <!-- modal-dialog -->
+                </div> <!-- modal -->
             {% endfor %}
         </div> <!-- accordion -->
     {% endif %}
