@@ -1,9 +1,11 @@
-import pytest
-
 import os
 import sys
+
+import pytest
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from alfie import app  # noqa: import not at top of file
 import alfie  # noqa: import not at top of file
 alfie.projects = {'icepap-ipassign':
                   {'README': ('tests/test_data/ipa/README.md',
@@ -11,8 +13,6 @@ alfie.projects = {'icepap-ipassign':
                    'GUI README': ('tests/test_data/ipa/gui/gui.md',
                                   'Qt GUI implementation details')}
                   }
-
-from alfie import app  # noqa: import not at top of file
 
 
 @pytest.mark.asyncio
