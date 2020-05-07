@@ -64,17 +64,10 @@
                 <div class="container my-2">
                     <div class="alert alert-danger">
                         {% for message in flashes %}
-                            <center><span id="blinker"> {{ message }} </span></center>
+                            <center> {{ message }} </center>
                         {% endfor %}
                     </div> <!-- alert -->
                 </div> <!-- container -->
-                <script>
-                    var blink_speed = 200;
-                    var t = setInterval(function () {
-                        var ele = document.getElementById('blinker');
-                        ele.style.visibility = (ele.style.visibility == 'hidden' ? '' : 'hidden');
-                        }, blink_speed);
-                </script>
             {% endif %}
         {% endwith %}
         <div class="container">

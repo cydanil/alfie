@@ -1,4 +1,7 @@
-quart
+aiosqlite
+databases
 pypandoc
 pytest
 pytest-asyncio
+quart
+toml

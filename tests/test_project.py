@@ -1,22 +1,21 @@
-import os
+import os.path as op
 import sys
 
+from databases import Database
 import pytest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+sys.path.append(op.abspath(op.join(op.dirname(__file__), '..')))
 from alfie import app  # noqa: import not at top of file
-import alfie  # noqa: import not at top of file
-alfie.projects = {'icepap-ipassign':
-                  {'README': ('tests/test_data/ipa/README.md',
-                              'Full project readme'),
-                   'GUI README': ('tests/test_data/ipa/gui/gui.md',
-                                  'Qt GUI implementation details')}
-                  }
+import create_db  # noqa
+from create_test_db import (create_and_populate_test_db,  # noqa
+                            insert_document, insert_project_entry, projects)
 
 
 @pytest.mark.asyncio
-async def test_load_projects():
+async def test_load_projects(tmpdir):
+    await create_and_populate_test_db(tmpdir)
+    db_path = f"sqlite:///{tmpdir / 'alfie.db'}"
+    app.config['DATABASE'] = db_path
     client = app.test_client()
 
     # Test export as text file ok.
@@ -25,29 +24,31 @@ async def test_load_projects():
 
     page = (await response.get_data()).decode()
 
-    key, = alfie.projects.keys()
-    assert key in page
-
-    for name, (loc, desc) in alfie.projects[key].items():
-        assert name in page
-        assert loc in page
-        assert desc in page
+    for key in projects.keys():
+        assert key in page
+        for name, (loc, desc) in projects[key].items():
+            assert name in page
+            assert loc in page
+            assert desc in page
 
 
 @pytest.mark.asyncio
-async def test_load_no_project():
-    projects, alfie.projects = alfie.projects, {}
+async def test_load_no_project(tmpdir):
+    await create_db.create(tmpdir / 'alfie.db')
+    db_path = f"sqlite:///{tmpdir / 'alfie.db'}"
+    app.config['DATABASE'] = db_path
     client = app.test_client()
 
     response = await client.get('/index')
     page = await response.get_data()
     assert b'No project available' in page
 
-    alfie.projects = projects
-
 
 @pytest.mark.asyncio
-async def test_add_to_project():
+async def test_add_to_project(tmpdir):
+    await create_and_populate_test_db(tmpdir)
+    db_path = f"sqlite:///{tmpdir / 'alfie.db'}"
+    app.config['DATABASE'] = db_path
     client = app.test_client()
 
     project = 'icepap-ipassign'
@@ -62,8 +63,12 @@ async def test_add_to_project():
     page = await response.get_data()
     assert b'<title>Redirect</title>' in page
 
-    assert name in alfie.projects[project].keys()
-    assert alfie.projects[project][name] == (location, description)
+    async with Database(db_path) as db:
+        query = f'SELECT * FROM Document WHERE Name = "{name}"'
+        ret = await db.fetch_one(query)
+    assert name == ret[1]
+    assert location == ret[2]
+    assert description == ret[3]
 
     response = await client.get('/index')
     page = (await response.get_data()).decode()
@@ -74,21 +79,34 @@ async def test_add_to_project():
 
 
 @pytest.mark.asyncio
-async def test_remove_from_project():
+async def test_remove_from_project(tmpdir):
+    await create_and_populate_test_db(tmpdir)
+    db_path = f"sqlite:///{tmpdir / 'alfie.db'}"
+    app.config['DATABASE'] = db_path
     client = app.test_client()
     project = 'icepap-ipassign'
     name = 'Mock File'
-    location = '/whatever/place/file.rst'
-    description = 'Not a real file, just testing that entries are removed ok'
+    loc = '/whatever/place/file.rst'
+    desc = 'Not a real file, just testing that entries are removed ok'
 
-    alfie.projects[project][name] = (location, description)
+    get_pid = f'SELECT ProjectId FROM Project WHERE Name = "{project}"'
+    async with Database(db_path) as db:
+        pid = await db.fetch_val(get_pid)
+        did = await db.execute(insert_document, values={'Name': name,
+                                                        'Location': loc,
+                                                        'Description': desc})
+        await db.execute(insert_project_entry, values={'ProjectId': pid,
+                                                       'DocumentId': did})
 
     response = await client.post('/remove', form={'document': name,
                                                   'project': project})
     page = await response.get_data()
     assert b'<title>Redirect</title>' in page
 
-    assert name not in alfie.projects[project].keys()
+    async with Database(db_path) as db:
+        query = f'SELECT * FROM Project WHERE ProjectId = {did}'
+        ret = await db.fetch_one(query)
+    assert ret is None
 
     response = await client.get('/index')
     page = (await response.get_data()).decode()
@@ -96,7 +114,10 @@ async def test_remove_from_project():
 
 
 @pytest.mark.asyncio
-async def test_add_project():
+async def test_add_project(tmpdir):
+    await create_and_populate_test_db(tmpdir)
+    db_path = f"sqlite:///{tmpdir / 'alfie.db'}"
+    app.config['DATABASE'] = db_path
     client = app.test_client()
 
     response = await client.post('/create', form={'name': 'cuckoo'})
@@ -104,7 +125,10 @@ async def test_add_project():
 
     assert b'<title>Redirect</title>' in page
 
-    assert 'cuckoo' in alfie.projects.keys()
+    query = 'SELECT ProjectId FROM Project WHERE Name = "cuckoo"'
+    async with Database(db_path) as db:
+        ret = await db.fetch_val(query)
+    assert ret == 7
 
     response = await client.get('/index')
     page = (await response.get_data()).decode()
