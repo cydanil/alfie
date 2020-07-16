@@ -4,6 +4,7 @@ from asyncio import gather, get_event_loop
 import io
 import os
 from pathlib import Path
+from typing import Optional
 import zipfile
 
 import pypandoc
@@ -173,6 +174,39 @@ async def remove():
     return redirect(f'{url_for("index")}#{proj_name}')
 
 
+@app.route('/show/', defaults={'filename': None}, methods=['GET', 'POST'])
+@app.route('/show/<path:filename>')
+async def show(filename: Optional[str] = None) -> str:
+    """Render a file from a URL."""
+
+    if filename is None:  # Check if the data was received over POST
+        form = await request.form
+        filename = form.get('filename', None)
+        if filename is not None:
+            return redirect(f'{url_for("show")}/{filename}')
+
+    if filename is None:  # It was a GET request, with no arguments
+        html = await render_template('show.html')
+        return html
+
+    deg_doc = "https://deg-doc.esrf.fr/"
+
+    if not filename.startswith(deg_doc):
+        await flash(f'Only files from {deg_doc} are supported')
+        html = await render_template('base.html')
+        return html
+
+    fname = filename[len(deg_doc):]
+    if not fname:
+        await flash('Cheeky you, not giving me a filename...')
+        html = await render_template('base.html')
+        return html
+
+    fname = "/var/www/docs/" + fname
+    html = await retrieve(fname)
+    return html
+
+
 @app.route('/retrieve/<path:filename>')
 async def retrieve(filename: str) -> str:
     """Retrieve the files from a project.
@@ -208,10 +242,10 @@ async def retrieve(filename: str) -> str:
     elif extension == 'pdf':
         await flash('This is not done yet!')
         url = url_for('pdf', filename=filename)
-        content = f'<embed src="{url}" type="application/pdf#view=FitH" width="actual-width.px" height="actual-height.px"></embed>'
+        content = f'<embed src="{url}" type="application/pdf#view=FitH" width="actual-width.px" height="actual-height.px"></embed>'  # noqa
         ret = await render_template('render.html', content=content)
 
-    elif extension == 'html':
+    elif extension in ['html', 'txt']:
         try:
             with open(filename, 'r') as fin:
                 content = fin.read()
@@ -219,8 +253,10 @@ async def retrieve(filename: str) -> str:
         except FileNotFoundError:
             await flash(f'{filename}: not found!')
             ret = await render_template('base.html')
+
     else:
-        return
+        await flash(f"{filename}: don't know what to do with this!")
+        ret = await render_template('base.html')
 
     return ret
 
